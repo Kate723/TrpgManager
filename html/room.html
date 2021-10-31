@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<head>
+    <meta charset = "utf-8">
+    <meta name = "viewport" content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no" />
+
+    <title>FATE角色卡管理系统</title>
+    <link rel = "stylesheet" href = "/css/main.css">
+    <link rel = "shortcut icon" href = "/img/fate.svg">
+    <script src = "https://unpkg.com/vue@next"></script>
+    <script src = "/js/loginCheck.js"></script>
+</head>
+<body>
+    <!-- head -->
+    <header id="vhead">
+        <div class="header_text">
+            <h1>TRPGQuill</h1>
+            <p>今天你<font color = #222222>跑团</font>了吗？</p>
+        </div>
+        <div class = "usrName">{{ usrName }}</div>
+        <button id = "logoutBtn" class= "logoutButton" @click = "logout">退出登录</button>
+    </header>
+
+    <div class="mainTab">
+        <div id = "app" class = "tab">
+            <h2> {{ room.r_name }} </h2>
+            <div class="card" style="width: 20%;">
+                <transition-group name="list">
+                    <div class = "card"
+                    style="width: 100%;"
+                    v-for="(user, index) in users"
+                    key="fade">
+                    <img class="pic_mark" src="/img/gm_mark.png"
+                        style="width: 2em; height: 2em;" 
+                        v-if = "user.uid === room.uid">
+                        <h3> {{user.u_name}} </h3>
+                        <h4> {{ chrcterName(user) }} </h4>
+                        <button v-if = "user.uid === uid && !user.cid"
+                            @click = "chrcterSelect"> 添加角色 </button>
+                        <button v-if = "user.cid"
+                            @click = "chrcterParse(index)">浏览角色</button>
+                        <transition-group name="list">
+                            <button v-if = "c_select && user.uid === uid"
+                            v-for="(chrcter, index) in chrcters"
+                            key="fade"
+                            @click = "chrcterAdd(index)"> {{chrcter.c_name}} </button>
+                        </transition-group>
+                    </div>
+                </transition-group>   
+            </div>
+
+            <div class="card" style="width: 80%;">
+                <transition-group name="list">
+                    <div class = "card"
+                    style="width: 100%; padding: 0.2em;"
+                    v-for="(log, index) in logs"
+                    key="fade">
+                    {{log_time(log.log_time)}} {{log.log_content}}
+                    <button @click = "logReaded(index)"
+                        style = "margin: 0;height: 1.5em;line-height: 1.5em;float: right;"> 已读 </button>
+                    </div>
+                </transition-group>
+            </div>
+
+            <transition name = "fade">
+            <div class="editWin"
+                v-if = "view === true">
+                <h2> {{chrcter.c_name}} </h2>
+                <p> 角色组： {{chrcter.cg_name}} </p>
+                <p> 核心概念： {{chrcter.high_concept}} </p>
+                <p> 困扰： {{chrcter.trouble}} </p>
+                <h3> 特征：  </h3>
+                <transition-group name="list">
+                    <p
+                    v-for="(aspect, index) in caspects"
+                    key="fade">
+                    {{aspect.a_desp}}
+                    </p>
+                </transition-group>    
+                <p> 重振值： {{chrcter.refresh}} </p>
+                <p> 命运点数： {{chrcter.FP}} </p>
+                <h3> 技能： </h3>
+                <transition-group name="list">
+                    <p
+                    v-for="(skill, index) in cskills"
+                    key="fade">
+                    {{skill.sk_name}}: {{skill.level}}
+                    </p>
+                </transition-group>
+                <h3> 特技：</h3>
+                <transition-group name="list">
+                    <p
+                    v-for="(stunt, index) in cstunts"
+                    key="fade">
+                    {{stunt.st_name}}
+                    </p>
+                </transition-group>
+                <p> 心理压力： {{chrcter.psychological_stress}} </p>
+                <p> 生理压力： {{chrcter.physical_stress}} </p>
+                <h3> 伤痕： </h3>
+                <transition-group name="list">
+                    <p
+                    v-for="(conq, index) in cconqs"
+                    key="fade">
+                    {{conq_type(parseInt(conq.cq_type))}}: {{conq.cq_desp}}
+                    </p>
+                </transition-group>
+                <p> 角色描述： {{chrcter.c_description}} </p>
+            </div>
+            </transition>
+        </div>
+    </div>
+<script src = "/components/room.js"></script>
+<script src = "/js/logStatus.js"></script>
+</body>

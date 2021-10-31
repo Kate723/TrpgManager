@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<head>
+    <meta charset = "utf-8">
+    <meta name = "viewport" content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no" />
+    <title>FATE角色卡管理系统</title>
+
+    <link rel = "shortcut icon" href = "/img/fate.svg">
+    <link rel = "stylesheet" href = "/css/main.css">
+    <script src = "https://unpkg.com/vue@next"></script>
+    <script src="/js/md5.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header id="vhead">
+            <div class="header_text">
+                <h1>TRPGQuill</h1>
+                <p>今天你<font color = #222222>跑团</font>了吗？</p>
+            </div>
+        </header>
+        <div class = "log_win">
+            <div id="dynamic-tab">
+                <button
+                   v-for="tab in tabs"
+                   v-bind:key="tab.id"
+                   v-bind:class="['tab-button', { active: currentTab === tab.id }]"
+                   v-on:click="currentTab = tab.id"
+                 >
+                  {{ tab.name }}
+                </button>
+                <notice-bar v-if = "message != null" v-bind:message="message"></notice-bar>
+                <div v-if = "currentTab === 'login'">
+                    <input v-model = "uid" class = "logInput" type = "text" placeholder="请输入用户名" />
+                    <input v-model = "usrPwd" class = "logInput" type = "password" placeholder = "请输入密码" @keyup.enter="login">
+                    <button class= "Button" @click = "login">登录</button>
+                </div>
+                <div v-if = "currentTab === 'reg'">
+                    <input v-model = "regid" class = "logInput" type = "text" placeholder="请输入用户名" />
+                    <input v-model = "regPwd" class = "logInput" type = "password" placeholder = "请输入密码">
+                    <input v-model = "regPwd2" class = "logInput" type = "password" placeholder = "请再次输入密码" @keyup.enter="reg">
+                    <button class= "Button" @click = "reg">注册</button>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <script src = "/components/notice_bar.js"></script>
+    <script src = "/components/login.js"></script>
+</body>    

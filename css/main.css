@@ -1,0 +1,321 @@
+/* reset part */
+header,footer,nav,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,hr,pre,form,fieldset,input,button,textarea,p,blockquote,th,td{
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    background-color:black;
+}
+
+div{
+    box-sizing: border-box;
+}
+
+fieldset,img,html,body,iframe{
+    border:0;
+}
+
+table{
+    border-collapse:collapse;
+    border-spacing:0;
+}
+li{
+    list-style:none;
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-weight:bold;
+}
+
+caption,th{
+    font-weight:normal;
+    font-style:normal;
+    text-align:left;
+}
+
+em,strong{
+    font-weight:bold;
+    font-style:normal;
+}
+
+small{
+    font-size:100%;
+}
+
+body,textarea,select,input,button{
+    font-family:"Hiragino Sans GB","Microsoft YaHei","微软雅黑",tahoma,arial,simsun,"宋体";
+    font-size:1em;
+    color:#444;
+}
+
+html,body{
+    width:100%;height:100%;
+}
+
+html{
+    overflow:hidden;overflow-y:scroll;
+}
+
+textarea{
+    overflow:auto;
+    resize: vertical;
+}
+
+a,button{
+    cursor:pointer;
+}
+
+a{
+    text-decoration:none;
+    color:#444;
+    outline:none;
+}
+
+a:hover{
+    text-decoration:none;
+    color:#7594B3;
+}
+
+/* public part */
+
+body{
+    height: 100%;
+    width: 100%;
+
+    background-image: url("/img/fate.png");
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+header{
+    box-sizing: border-box;
+    height: 5em;
+    width: 100%;
+    background: #222222;
+    margin:0;
+    border:0;
+    padding: 0.625em 1.875em;
+    position: relative;
+}
+.header_text{
+    color: #efefef;
+    float: left;
+    text-align: center;
+}
+header h1{
+    font-size: 2em;
+}
+header p{
+    font-size: 0.75em;
+}
+
+/* class part */
+.mainTab {
+    padding: 1.5em 2em;
+    margin-top: 1em;
+    margin-bottom: 2.5em;
+    user-select: none;
+    overflow-x: auto;
+    width: 80%;
+    margin: auto;
+}
+
+.log_win{
+    height: fit-content;
+    min-width: 13em;
+    width: 40%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    padding: 2.5em 4.5em;
+
+    background: #ededef;
+    opacity: 0.9;
+    border-radius: 0.625em;
+    align-items: center;
+}
+
+input,textarea{
+    height: 10em;
+    width: 80%;
+    background: #ffffff;
+    margin: 0.5em 1em;
+    border: 0.0625em solid #d4d4d5;
+    padding: 0.4em 0.7em;
+    border-radius: 1em;
+    display: inline-block;
+    outline: none;
+}
+input{
+    padding: 0em 0.5em;
+    height: 2em;
+    display: inline-block;
+}
+input:required{
+    background: transparent;
+    border: none;
+}
+
+.input_short{
+    width: 20%;
+}
+
+.logInput{
+    width: 85%;
+    min-width: 7.5em;
+    height: 3em;
+    transition: all 0.3s;
+    border-radius: 1.5em;
+    margin: 0.5em auto 1em;
+    color: #1F1F1F;
+    align-items: center;    
+    overflow: hidden;
+}
+
+.Button{
+    width: 75%;
+    border-radius: 1.75em;
+    font-size: 1.125em;
+    margin: 0.5em 2.5em;
+}
+button{
+    height: 2.5em;
+    border-radius: 1em;
+    line-height: 2.5em;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1em;
+    border-color: #4EB7BA;
+    background-color: #4EB7BA;
+    margin: 0.5em;
+    padding: 0 1em;
+}
+.usrName {
+    display: inline-block;
+    max-width: 10em;
+    color: #ffffff;
+    margin: 1.25em;
+}
+
+.roundButton, .rotateButton{
+    background-color: #4EB7BA;
+    border: 0;
+    border-radius: 2em;
+    transition: all 1s;
+    padding: 0.75em;
+    margin: 0.5em;
+    width: 4em;
+    height: 4em;
+    float: right;
+}
+.rotateButton{
+    transform: rotate(45deg);
+}
+
+.editWin{
+    clear: both;
+    padding: 1em 2em;
+    border: 0.0625em solid #d4d4d5;
+    border-radius: 2em;
+    background-color: rgba(250, 250, 250, 0.8);
+}
+
+.radio{
+    width: 1em;
+    line-height: 1em;
+    margin: 0.5em 0.5em;
+}
+
+.input_area{
+    clear:both;
+    padding: 0.5em;
+}
+  
+.tab-button {
+    height: fit-content;
+    line-height: 1em;
+    font-weight: bold;
+    font-size: 1.5em;
+    color:#444;
+    padding: 0.75em 1.125em;
+    border-radius: 0em;
+    border: 0;
+    margin: 0;
+    cursor: pointer;
+    border: 0;
+    background: rgba(250, 250, 250, 0.8);
+}
+.tab-button:hover {
+    background: #f0f0f0;
+}
+.tab-button.active {
+    padding: 0 0 0.75em;
+    background: #f0f0f0;
+}
+.tab-button.active::before{
+    content: '';
+    display: block;
+    bottom: -0.0625em;
+    min-width: 4.17em;
+    height: 0.25em;
+    margin: 0 0 0.5em;
+    border-radius: 0.125em;
+    background: #4EB7BA;
+    position: relative;
+    left: 0;
+    top: 0;
+}
+.tab {
+    background-color: rgba(250, 250, 250, 0.8);
+    padding: 2em;
+    min-height: 30em;
+    transition: all 0.3s linear 0s;
+}
+
+.notice_bar{
+    background-color: rgba(150, 150, 150, 0.7);
+    border-radius: 0.5em;
+    padding: 0.7em;
+    margin: 0.5em auto 0.25em;
+}
+
+.card{
+    width: 50%;
+    padding: 1em;
+    display: inline-block;
+}
+
+.pic_mark{
+    /* width: 3em; */
+    height: 3em;
+    float: right;
+    margin-right: 1em;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+
+.list-enter-active,
+.list-leave-active {
+    transition: all 1s ease;
+}
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+}
+.list-move {
+    transition: transform 0.8s ease;
+}

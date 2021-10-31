@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<head>
+    <meta charset = "utf-8">
+    <meta name = "viewport" content = "width = device-width, initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no" />
+
+    <title>FATE角色卡管理系统</title>
+    <link rel = "stylesheet" href = "/css/main.css">
+    <link rel = "shortcut icon" href = "/img/fate.svg">
+    <script src = "https://unpkg.com/vue@next"></script>
+    <script src = "/js/loginCheck.js"></script>
+</head>
+<body>
+    <!-- head -->
+    <header id="vhead">
+        <div class="header_text">
+            <h1>TRPGQuill</h1>
+            <p>今天你<font color = #222222>跑团</font>了吗？</p>
+        </div>
+        <div class = "usrName">{{ usrName }}</div>
+        <button id = "logoutBtn" class= "logoutButton" @click = "logout">退出登录</button>
+    </header>
+
+    <!-- 动态选项卡 -->
+    <div id="dynamic-tab" class="mainTab">
+        <br>
+        <!-- 普通选项卡 -->
+        <button
+        v-for="tab in tabs"
+        v-bind:key="tab.id"
+        v-bind:class="['tab-button', { active: currentTab === tab.id }]"
+        v-on:click="changeTab(tab.id)"
+        >
+        {{ tab.name }}
+        </button>
+        <!-- 管理选项卡 -->
+        <button
+        v-for="tab in admin_tabs"
+        v-bind:key="tab.id"
+        v-bind:class="['tab-button', { active: currentTab === tab.id }]"
+        v-on:click = "changeTab(tab.id)"
+        v-if = "usrName === 'admin'"
+        >
+        {{ tab.name }}
+        </button>
+        <!-- 编辑按钮 -->
+        <button :class="[ view || search || edit ?'rotateButton':'roundButton']"
+        @click = "plusClicked">
+            <img src="/img/plus.svg" width="40">
+        </button>
+        <!-- 搜索按钮 -->
+        <button class="roundButton" 
+        @click = "roomSearch()"
+        v-if = "currentTab === 'room'">
+            <img src="/img/search.svg" width="40">
+        </button>
+        <input v-model = "search_rname" class = "input" 
+            v-if = "currentTab === 'room'"
+            style="width: 15em; float: right;" type = "text" 
+            placeholder="查找房间……" />
+        
+        <!-- 房间选项卡 -->
+        <div class = "tab" v-if = "currentTab === 'room'" >
+
+            <h3 v-if = "search === true">
+                共找到房间 {{allroomNum}} 个
+            </h3>
+
+            <transition-group name="list" v-if = "search === true">
+                <div class = "card"
+                v-for="(room, index) in all_rooms"
+                key="fade">
+                    <img class="pic_mark" src="/img/gm_mark.png" 
+                        v-if = "all_rooms[index].gmid === usrName">
+                    <h2> {{room.r_name}} </h2>
+                    <h3> {{room.u_name}} </h3>
+                    <p> {{room.r_desp}} </p>
+                    <button @click = "roomJoin(index)">加入房间</button>
+                </div>
+            </transition-group>
+
+            <h3 v-if = "search === false">
+                您所在的房间有 {{roomNum}} 个
+            </h3>
+            <transition-group name="list" v-if = "search === false">
+                <div class = "card"
+                v-for="(room, index) in rooms"
+                key="fade">
+                    <img class="pic_mark" src="/img/gm_mark.png" 
+                        v-if = "rooms[index].gmid === usrName">
+                    <h2> {{room.r_name}} </h2>
+                    <p> {{room.r_desp}} </p>
+                    <button @click = "roomEnter(index)">进入房间</button>
+                    <button @click = "roomDelete(index)">删除房间</button>
+                </div>
+            </transition-group>
+
+            <transition name = "fade">
+                <div class = "editWin" 
+                v-if = "edit === true">
+                    <p>房间名称</p>
+                    <input v-model = "name" class = "input" type = "text" placeholder="取个名字吧" maxlength = "20" size = "20" />
+                    <p>房间描述</p>
+                    <textarea v-model = "desp" class = "input" type = "text"></textarea>
+                    <button @click = "itemAdd('room')">建立房间</button>
+                </div>
+            </transition>
+        </div>
+
+        <!-- 角色选项卡 -->
+        <div class = "tab" v-if = "currentTab === 'chrcter'" >
+
+            <h3>您创建的角色有 {{chrcterNum}} 个</h3>
+
+            <transition-group name="list">
+                <div class = "card"
+                v-for="(chrcter, index) in chrcters"
+                key="fade">
+                <img class="pic_mark" src="/img/pc_mark.png" v-if = "isPC(chrcter.cgid)">
+                <img class="pic_mark" src="/img/npc_mark.png" v-else>
+                    <h2> {{chrcter.c_name}} </h2>
+                    <h3> {{chrcter.high_concept}} </h3>
+                    <p> {{substring(chrcter.c_description, 80)}} </p>
+                    <transition name = "fade">
+                    <div class="editWin"
+                        v-if = "view === true && cindex === index">
+                        <h2> {{chrcter.c_name}} </h2>
+                        <p> 角色组： {{chrcter.cg_name}} </p>
+                        <p> 所属房间： {{chrcter.r_name}}</p>
+                        <p> 核心概念： {{chrcter.high_concept}} </p>
+                        <p> 困扰： {{chrcter.trouble}} </p>
+                        <h3> 特征：  </h3>
+                        <transition-group name="list">
+                            <p
+                            v-for="(aspect, index) in caspects"
+                            key="fade">
+                            {{aspect.a_desp}}
+                            </p>
+                        </transition-group>    
+                        <p> 重振值： {{chrcter.refresh}} </p>
+                        <p> 命运点数： {{chrcter.FP}} </p>
+                        <h3> 技能： </h3>
+                        <transition-group name="list">
+                            <p
+                            v-for="(skill, index) in cskills"
+                            key="fade">
+                            {{skill.sk_name}}: {{skill.level}}
+                            </p>
+                        </transition-group>
+                        <h3> 特技：</h3>
+                        <transition-group name="list">
+                            <p
+                            v-for="(stunt, index) in cstunts"
+                            key="fade">
+                            {{stunt.st_name}}
+                            </p>
+                        </transition-group>
+                        <p> 心理压力： {{chrcter.psychological_stress}} </p>
+                        <p> 生理压力： {{chrcter.physical_stress}} </p>
+                        <h3> 伤痕： </h3>
+                        <transition-group name="list">
+                            <p
+                            v-for="(conq, index) in cconqs"
+                            key="fade">
+                            {{conq_type(parseInt(conq.cq_type))}}: {{conq.cq_desp}}
+                            </p>
+                        </transition-group>
+                        <p> 角色描述： {{chrcter.c_description}} </p>
+                    </div>
+                    </transition>
+                    <button @click = "chrcterEnter(index)" v-if = "!view && cindex != index">浏览角色</button>
+                    <button @click = "cindex = -1; view = false" v-if = "view && cindex === index">收起角色</button>
+                    <button @click = "chrcterEdit(index)">编辑角色</button>
+                    <button @click = "chrcterDelete(index)">删除角色</button>
+                </div>
+            </transition-group>
+            <!-- 新建角色 -->
+            <transition name = "fade">
+                <div class = "editWin" 
+                v-if = "edit === true">
+                    <p>角色名称</p>
+                    <input v-model = "name" class = "input" type = "text" placeholder="取个名字吧" maxlength = "20" size = "20" />
+                    
+                    <!-- 角色组选择 -->
+                    <p>角色组: {{ cg_name }}</p>
+                    <button @click = "select = !select">选择角色组</button>
+                    <!--  角色组列表 -->
+                    <transition-group name="list">
+                        <button v-if = "select"
+                        v-for="(cgroup, index) in cgroups"
+                        @click = "cgselect(index)"
+                        key="fade">
+                            {{ cgroup.cg_name }}
+                        </button>
+                    </transition-group>
+
+                    <br>
+                    核心概念<input v-model = "high_concept" class = "input" type = "text"/>
+                    <br>
+                    困扰<input v-model = "trouble" class = "input" type = "text"/>
+                    
+                    <h2>特征</h2>
+                    <!-- 显示已添加特征 -->
+                    <transition-group name="list">
+                        <div v-for="(aspect, index) in caspects"
+                        key="fade">
+                            {{ aspect.a_desp }}
+                            <button @click = "aspectDelete(index)">删除特征</button>
+                        </div>
+                        <div v-for="(aspect, index) in aspects_add"
+                        key="fade">
+                            {{ aspect.a_desp }}
+                            <button @click = "tmpAspectDelete(index)">删除特征</button>
+                        </div>
+                    </transition-group>
+                    <br>
+                    <button @click = "aspect_edit = !aspect_edit">添加特征</button>
+                    <!-- 特征添加 -->
+                    <transition name = "fade">
+                        <div v-if = "aspect_edit">
+                        特征描述<input v-model = "a_desp" class = "input_short" type = "text" />
+                        <button @click = "caspectAdd()">保存</button>
+                        </div>
+                    </transition>
+                    <br>
+
+                    重振值<input v-model = "refresh" class = "input_short" type = "text" />
+                    命运点数<input v-model = "FP" class = "input_short" type = "text" />
+                    <br>
+
+                    <h2>技能</h2>
+                    <!-- 显示已添加技能 -->
+                    <transition-group name="list">
+                        <div class = "card" v-for="(skill, index) in cskills"
+                        key="fade">
+                            {{ skill.level }}: {{ skill.sk_name }}
+                            <button @click = "cskillDelete(index)">删除技能</button>
+                        </div>
+                        <div class = "card" v-for="(skill, index) in skills_add"
+                        key="fade">
+                            {{ skill.level }}: {{ skill.sk_name }}
+                            <button @click = "tmpSkillDelete(index)">删除技能</button>
+                        </div>
+                    </transition-group>
+                    <br>
+                    <button @click = "skill_edit = !skill_edit">添加技能</button>
+                    <br>
+                    <!-- 技能添加 -->
+                    <transition-group name="list">
+                        <button v-if = "skill_edit"
+                        v-for="(skill, index) in skills"
+                        @click = "skid = index"
+                        key="fade">
+                            {{ skill.sk_name }}
+                        </button>
+                    </transition-group>
+                    <transition name = "fade">
+                        <div v-if = "skill_edit">
+                        技能等级<input v-model = "sk_lv" class = "input_short" type = "text" />
+                        <br>
+                        <h3>{{ sk_lv }}: {{ sk_name }} </h3>
+                        <button @click = "cskillAdd()">保存</button>
+                        </div>
+                    </transition>
+                    <br>
+
+                    <h2>特技</h2>
+                    <!-- 显示已添加特技 -->
+                    <transition-group name="list">
+                        <div class = "card" v-for="(stunt, index) in cstunts"
+                        key="fade">
+                            {{ stunt.st_name }}
+                            <button @click = "cstuntDelete(index)">删除特技</button>
+                        </div>
+                        <div class = "card" v-for="(stunt, index) in stunts_add"
+                        key="fade">
+                            {{ stunt.st_name }}
+                            <button @click = "tmpstuntDelete(index)">删除特技</button>
+                        </div>
+                    </transition-group>
+                    <br>
+                    <button @click = "stunt_edit = !stunt_edit">添加特技</button>
+                    <br>
+                    <!-- 特技添加 -->
+                    <transition-group name="list">
+                        <button v-if = "stunt_edit"
+                        v-for="(stunt, index) in stunts"
+                        @click = "cstuntAdd(index)"
+                        key="fade">
+                            {{ stunt.st_name }}
+                        </button>
+                    </transition-group>
+                    <br>
+
+                    心理压力<input v-model = "psychological_stress" class = "input_short" type = "text" />
+                    生理压力<input v-model = "physical_stress" class = "input_short" type = "text" />
+                    <br>
+
+                    <h2>伤痕</h2>
+                    <!-- 显示已添加伤痕 -->
+                    <transition-group name="list">
+                        <div v-for="(conq, index) in cconqs"
+                        key="fade">
+                            {{ conq_type(conq.cq_type) }}:  {{ substring(conq.cq_desp,50) }}
+                            <button @click = "conqDelete(index)">删除伤痕</button>
+                        </div>
+                        <div v-for="(conq, index) in conqs_add"
+                        key="fade">
+                            {{ conq_type(conq.cq_type) }}: {{ substring(conq.cq_desp,50) }}
+                            <button @click = "tmpConqDelete(index)">删除伤痕</button>
+                        </div>
+                    </transition-group>
+                    <br>
+                    <button @click = "conq_edit = !conq_edit">添加伤痕</button>
+                    <!-- 伤痕添加 -->
+                    <transition name = "fade">
+                        <div v-if = "conq_edit">
+                        <div class="select">
+                            <input class="radio" type="radio" name="conq" @click = "cq_type = 0"/> 轻度
+                            <input class="radio" type="radio" name="conq" @click = "cq_type = 1"/> 中度
+                            <input class="radio" type="radio" name="conq" @click = "cq_type = 2"/> 重度
+                        </div>
+                        伤痕描述<input v-model = "cq_desp" class = "input" type = "text" />
+                        <button @click = "cconqAdd()">保存</button>
+                        </div>
+                    </transition>
+                    
+
+                    <br>
+
+                    <p>角色描述</p>
+                    <textarea v-model = "desp" class = "input" type = "text"></textarea>
+                    <br>
+                    <button @click = "chrcterSave()">保存</button>
+                    <button @click = "editCancel()">取消</button>
+                </div>
+            </transition>
+        </div>
+
+        <!-- 技能选项卡 -->
+        <div class = "tab" v-if = "currentTab === 'skill'" >
+
+            <h3>您创建的技能有 {{skillNum}} 个</h3>
+
+            <transition-group name="list">
+                <div class = "card"
+                v-for="(skill, index) in skills"
+                key="fade">
+                    <h2> {{skill.sk_name}} </h2>
+                    <p> {{substring(skill.description, 80)}} </p>
+                    <button @click = "skillDelete(index)">删除技能</button>
+                </div>
+            </transition-group>
+
+            <transition name = "fade">
+                <div class = "editWin" 
+                v-if = "edit === true">
+                    <p>技能名称</p>
+                    <input v-model = "name" class = "input" type = "text" placeholder="取个名字吧" maxlength = "20" size = "20" />
+                    <p>技能描述</p>
+                    <textarea v-model = "desp" class = "input" type = "text"></textarea>
+                    <button @click = "itemAdd('skill')">创建技能</button>
+                </div>
+            </transition>
+        </div>
+
+        <!-- 特技选项卡 -->
+        <div class = "tab" v-if = "currentTab === 'stunt'" >
+            <h3>您创建的特技有 {{stuntNum}} 个</h3>
+
+            <transition-group name="list">
+                <div class = "card"
+                v-for="(stunt, index) in stunts"
+                key="fade">
+                    <h2> {{stunt.st_name}} </h2>
+                    <p> {{substring(stunt.description, 80)}} </p>
+                    <button @click = "stuntDelete(index)">删除特技</button>
+                </div>
+            </transition-group>
+
+            <transition name = "fade">
+                <div class = "editWin" 
+                v-if = "edit === true">
+                    <p>所属技能: {{ sk_name }} </p>
+                    <button @click = "select = !select">选择技能</button>
+                    <transition-group name="list">
+                        <button v-if = "select"
+                        v-for="(skill, index) in skills"
+                        @click = "select = false; skid = index;"
+                        key="fade">
+                            {{ skill.sk_name }}
+                        </button>
+                    </transition-group>
+                    <p>特技名称</p>
+                    <input v-model = "name" class = "input" type = "text" placeholder="取个名字吧" maxlength = "20" size = "20" />
+                    <p>特技描述</p>
+                    <textarea v-model = "desp" class = "input" type = "text"></textarea>
+                    <button @click = "stuntAdd()">创建特技</button>
+                </div>
+            </transition>
+        </div>
+
+        <!-- 要求选项卡 -->
+        <div class = "tab" v-if = "currentTab === 'limit'" >
+            <h3>您创建的建卡要求有 {{limitNum}} 个</h3>
+
+            <transition-group name="list">
+                <div class = "card"
+                v-for="(limit, index) in limits"
+                key="fade">
+                    <h2> {{ limit.l_name }} </h2>
+                    <p> 技能选取方式：{{ limit.skill_mode }} </p>
+                    <p v-if = "skill_mode === '技能柱'"> 技能最高值：{{ limit.skill_limit }} </p>
+                    <p v-else> 技能点：{{ limit.skill_limit}} </p>
+                    <p> 重振值：{{ limit.refresh }} </p>
+                    <p> 免费特技数：{{ limit.free_stunt }} </p>
+                    <p> 特征数：{{ limit.aspect_limit }} </p>
+                    <button @click = "limitDelete(index)">删除要求</button>
+                </div>
+            </transition-group>
+
+            <transition name = "fade">
+                <div class = "editWin" 
+                v-if = "edit === true">
+                    <p>要求名称</p>
+                    <input v-model = "name" class = "input" type = "text" placeholder="取个名字吧" maxlength = "20" size = "20" />
+                    <p>技能选取方式</p>
+                    <div class="select">
+                        <input class="radio" type="radio" name="mode" @click = "skill_mode = 0"/> 金字塔
+                        <input class="radio" type="radio" name="mode" @click = "skill_mode = 1"/> 技能柱
+                    </div>
+                    
+                    <p v-if = "skill_mode === 1">技能点</p>
+                    <p v-else>技能最高值</p>
+                    <input v-model = "skill_limit" class = "input_short" type = "text"/>
+                    <p>重振值</p>
+                    <input v-model = "refresh" class = "input_short" type = "text"/>
+                    <p>免费特技</p>
+                    <input v-model = "free_stunt" class = "input_short" type = "text"/>
+                    <p>特征数量</p>
+                    <input v-model = "aspect_limit" class = "input_short" type = "text"/>
+                    <br>
+                    <button @click = "limitAdd()">创建要求</button>
+                </div>
+            </transition>
+        </div>
+
+        <!-- 角色组选项卡 -->
+        <div class = "tab" v-if = "currentTab === 'cgroup'" >
+            <h3>您创建的角色组有 {{cgroupNum}} 个</h3>
+
+            <transition-group name="list">
+                <div class = "card"
+                v-for="(cgroup, index) in cgroups"
+                key="fade">
+                    <h2> {{ cgroup.cg_name }} </h2>
+                    <p> 默认要求：{{ cgroup.l_name }} </p>
+                    <button @click = "cgroupDelete(index)">删除角色组</button>
+                </div>
+            </transition-group>
+
+            <transition name = "fade">
+                <div class = "editWin" 
+                v-if = "edit === true">
+                    <p>角色组名称</p>
+                    <input v-model = "name" class = "input" type = "text" placeholder="取个名字吧" maxlength = "20" size = "20" />
+                    <p>默认要求: {{ l_name }} </p>
+                    <transition-group name="list">
+                        <button v-for="(limit, index) in limits"
+                        @click = "l_selected = index;"
+                        key="fade">
+                            {{ limit.l_name }}
+                        </button>
+                    </transition-group>
+                    <div class="select">
+                        <input class="radio" type="radio" name="ispc" @click = "is_pc = true"/> PC
+                        <input class="radio" type="radio" name="ispc" @click = "is_pc = false"/> NPC
+                    </div>
+                    <br>
+                    <button @click = "cgroupAdd()">创建角色组</button>
+                </div>
+            </transition>
+        </div>
+    </div>
+    <script src = "/components/maintab.js"></script>
+    <script src = "/js/logStatus.js"></script>
+</body>
