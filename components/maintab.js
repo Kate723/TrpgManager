@@ -552,6 +552,10 @@ const app = Vue.createApp({
             });
         },
         chrcterParse(chrcter){
+			if (!chrcter.caspects) chrcter.caspects = "[]";
+            if (!chrcter.cskills) chrcter.cskills = "[]";
+            if (!chrcter.cstunts) chrcter.cstunts = "[]";
+            if (!chrcter.consequences) chrcter.consequences = "[]";
             this.caspects = JSON.parse(chrcter.aspects).filter(function (s) {return s.aid;});
             this.cskills = JSON.parse(chrcter.skills).filter(function (s) {return s.skid;});
             this.cstunts = JSON.parse(chrcter.stunts).filter(function (s) {return s.stid;});

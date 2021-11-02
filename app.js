@@ -5,7 +5,7 @@ var mysql = require('mysql2-promise')();
 mysql.configure({
   host     : 'localhost',
   user     : 'root',
-  password :  '',/* 这里没有密码 */
+  password :  'root',
   database : 'CharacterManage'
 });
 
