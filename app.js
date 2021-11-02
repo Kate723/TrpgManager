@@ -286,7 +286,7 @@ app.post('/roomAdd', function(req, res){
                 rooms: [{
                     room_id: id,
                     lid: null,
-                    uid: uid,
+                    gmid: uid,
                     r_name: r_name,
                     r_desp: r_desp
                 }]
