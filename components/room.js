@@ -148,6 +148,10 @@ const app = Vue.createApp({
                 return;
             }
             this.chrcter = this.users[index];
+            if (!this.chrcter.caspects) this.chrcter.caspects = "[]";
+            if (!this.chrcter.cskills) this.chrcter.cskills = "[]";
+            if (!this.chrcter.cstunts) this.chrcter.cstunts = "[]";
+            if (!this.chrcter.consequences) this.chrcter.consequences = "[]";
             this.caspects = JSON.parse(this.chrcter.aspects).filter(function (s) {return s.aid;});
             this.cskills = JSON.parse(this.chrcter.skills).filter(function (s) {return s.skid;});
             this.cstunts = JSON.parse(this.chrcter.stunts).filter(function (s) {return s.stid;});
