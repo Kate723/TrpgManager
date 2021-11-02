@@ -48,7 +48,8 @@
                 </transition-group>   
             </div>
 
-            <div class="card" style="width: 80%;">
+            <div v-if = "user.uid === room.uid" 
+                class="card" style="width: 80%;">
                 <transition-group name="list">
                     <div class = "card"
                     style="width: 100%; padding: 0.2em;"
