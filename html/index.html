@@ -466,7 +466,7 @@
                     <p>默认要求: {{ l_name }} </p>
                     <transition-group name="list">
                         <button v-for="(limit, index) in limits"
-                        @click = "l_selected = index;"
+                        @click = "lid = index;"
                         key="fade">
                             {{ limit.l_name }}
                         </button>
